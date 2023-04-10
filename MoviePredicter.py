@@ -10,14 +10,12 @@ class MoviePredicter():
     def predict(self, i:int, j:int) -> float:
         u, s, vt = svd(self.data)
 
-        print(s.shape)
-
-        s[-130:] *= 0.0
+        s[-641:] *= 0.0
 
         sigma = diagsvd(s, self.data.shape[0], self.data.shape[1])
 
         B = u @ sigma @ vt
-
+        
         return B[i][j]
 
 
@@ -32,14 +30,22 @@ def main():
 
     data = data.to_numpy()
 
-    mp = MoviePredicter(data)
-
     # Selects a random row and a random column from the data matrix
     i = np.random.randint(0, data.shape[0])
     j = np.random.randint(0, data.shape[1])
 
     real_score = data[i][j]
 
+    while real_score == 0:
+        i = np.random.randint(0, data.shape[0])
+        j = np.random.randint(0, data.shape[1])
+
+        real_score = data[i][j]
+
+    mp = MoviePredicter(data)
+
+    print(real_score)
+    print(i, j)
     # Inserts noise into the data matrix
     data[i][j] = np.random.randint(0, 5)
 
