@@ -1,4 +1,5 @@
 from scipy.linalg import svd, diagsvd
+import numpy as np
 
 
 class MoviePredicter():
@@ -7,7 +8,7 @@ class MoviePredicter():
         self.data = data
 
 
-    def predict(self, i:int, j:int) -> float:
+    def predict(self, indexes:list) -> float:
         u, s, vt = svd(self.data)
 
         s[-641:] *= 0.0
@@ -16,7 +17,7 @@ class MoviePredicter():
 
         B = u @ sigma @ vt
         
-        return B[i][j]
+        return np.array([B[i][j] for i,j in indexes])
 
 
 
