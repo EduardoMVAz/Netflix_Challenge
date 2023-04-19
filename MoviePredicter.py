@@ -4,14 +4,15 @@ import numpy as np
 
 class MoviePredicter():
 
-    def __init__(self, data):
+    def __init__(self, data, n_of_eigval=30):
         self.data = data
+        self.n_of_eigval = n_of_eigval
 
 
     def predict(self, indexes:list) -> float:
         u, s, vt = svd(self.data)
 
-        s[-641:] *= 0.0
+        s[-(671-self.n_of_eigval):] *= 0.0
 
         sigma = diagsvd(s, self.data.shape[0], self.data.shape[1])
 
@@ -43,17 +44,19 @@ def main():
 
         real_score = data[i][j]
 
+    # Inserts noise into the data matrix
+    data[i][j] = np.random.randint(0, 5)
+
     mp = MoviePredicter(data)
 
     print(real_score)
     print(i, j)
-    # Inserts noise into the data matrix
-    data[i][j] = np.random.randint(0, 5)
 
-    predicted_score = mp.predict(i, j)
+    predicted_score = mp.predict([(i, j)])
 
     print(f'Real score: {real_score}')
     print(f'Predicted score: {predicted_score}')
+
 
 
 
