@@ -36,19 +36,20 @@ Para utilizar o projeto <em>"Netflix Challenge"</em>, você deve ter o Python in
 
 Após instalar as dependências, no arquivo `demo.ipynb`, basta rodar célula por célula, em ordem, e acompanhar a geração das predições sobre os dados em diversos cenários. Alguns comentários e explicações estão presentes pelo *notebook*, mas todos os detalhamentos se encontram nesse arquivo `README.md`.
 
-*Atenção: alguns testes, como o `Teste (4)`, requerem grande tempo de processamento e alta capacidade computacional. Portanto, é indicado não rodar suas células novamente e apenas executar a criação do gráfico, que utiliza do arquivo `csv` gerado com antecedência em um notebook no *Google Cloud*.
+**Atenção**: alguns testes, como o `Teste (4)`, requerem grande tempo de processamento e alta capacidade computacional. Portanto, é indicado não rodar suas células novamente e apenas executar a criação do gráfico, que utiliza do arquivo `csv` gerado com antecedência em um notebook no *Google Cloud*.
 
 ---
 
 ## Modelo Matemático
 
-O modelo matemático do projeto "Netflix Challenge" é baseado no conceito de autovetores, autovalores e SVD (Singular value decomposition), e o objetivo é utilizar esses conceitos para tentar prever qual será a avaliação de um filme por um usuário em uma plataforma de _streaming_, baseando-se em informações e avaliações de outros usuários, e utilizar essa informação para recomendar filmes que o usuário provavelmente ira gostar.
+O modelo matemático do projeto "Netflix Challenge" é baseado no conceito de autovetores, autovalores e SVD (Singular Value Vecomposition), e seu objetivo é utilizar esses conceitos para tentar prever qual será a avaliação de um filme por um usuário em uma plataforma de _streaming_, baseando-se em informações e avaliações de outros usuários, e utilizar essa informação para recomendar filmes que o usuário provavelmente gostará.
 
-Resumidamente, a ideia é comparar os gostos de um usuário com outros usuários, de forma a encontrar a influência que seus outros gostos podem ter sobre suas preferências. Esse procedimento será melhor explicado vendo os significados dos conceitos utilizados.
+Resumidamente, a ideia é interpretar os autovetores dos dados como *perfis*, isto é, tendências entre as avaliações dos usuários. Dessa maneira, podemos "comparar gostos" de um usuário com o restante das bases de forma a encontrar a influência dos perfis na hora de realizar uma predição.Esse procedimento será melhor explicado vendo os significados dos conceitos utilizados.
 
 ### 1. Autovetores e Autovalores
 
-Autovetores e Autovalores são componentes de uma matriz que podem ser descritos da seguinte forma:
+**Autovetores e Autovalores** são componentes de uma matriz que podem ser descritos da seguinte forma:
+
 Considerando uma transformação linear, temos que um vetor `x` é um autovetor de uma matriz `A` quando ao multiplicar esse vetor pela própria matriz o resultado é um múltiplo do próprio vetor,
 
 $Ax = x\lambda$
@@ -57,16 +58,61 @@ Por multiplicações e inversões matriciais, conseguimos também obter a matriz
 
 $Ax = x\lambda$
 
-* isolamos o x usando matriz inversa
+* Isolamos o x usando matriz inversa
 
 $Axx^{-1} = x\lambda x^{-1}$
 
 $A = x\lambda x^{-1}$
 
+Essa formulação é a base de diversos processos de decomposição, como o **PCA** e o **SVD**, que se baseiam em separar matrizes de dados em matrizes de autovetores e autovalores, permitindo realizar manipulações e então reconstituir e aproximar as matrizes originais.
+
 ### 2. SVD
 
+SVD é uma técnica de decomposição de matrizes em função de matrizes singulares, ou seja, dependentes de seus autovetores e autovalores. Esse tipo de decomposição é utilizado especialmente em sistemas de recomendação, já que é possível manipular os autovalores de modo a tentar "advinhar" qual é o gosto de um usuário, e também em compressões de imagens, pois possibilita a remoção de ruído e compressão com perdas.
 
-### 3. Aplicando os Conceitos e realizando a predição
+Ela se baseia no seguinte modelo:
+
+$
+A = U \Sigma V^T,
+$
+
+onde:
+
+* As colunas de $U$ são os auto-vetores de $A^T A$ (matriz de covariância),
+* As colunas de $V$ (e, portanto, as linhas de $V^T$) são auto-vetores de $A A^T$,
+* $\Sigma$ é uma matriz onde $s_{i,i}$ é a raiz quadrada dos auto-valores de $A^T A$ ou de $A A^T$.
+
+Para entender o impacto dessa decomposição, precisamos entender os autovetores em si. Podemos analisá-los como **combinações lineares das features** de dados, de modo a criar *perfis*. Ou seja, são vetores que "apontam" na direção que maior impacta os dados, isto é, que mais representa **tendências** nos dados.
+
+Aplicando essa ideia no contexto do Netflix Challenge, os autovetores da matriz de uma matriz de *usuários x filmes* representam como *perfis* de gêneros cinematográficos: eles vão apontar para as tendências das notas dos usuários, já que, quanto possuem notas semelhantes para filmes semelhantes, os users criam tendências na base. Portanto, podemos usá-los para prever comportamentos.
+
+### 3. Decomposição de imagens e remoção de ruído
+
+O exemplo mais claro da utilidade dessa decomposição é na remoção de ruído de imagens. Aqui, as colunas e linhas representam as posições dos pixels, e os valores das matrizes como a cor RGB dos mesmos.
+
+No entanto, em uma imagem de baixa qualidade, ou com muito ruído, diversos pixels pela imagem "fogem ao padrão", isto é, não se encaixam a construção normal da imagem. Podemos relacionar isso com seus autovetores, já que pixels "fora da média" tenderão a se relacionar com os menores autovalores, pois não se conectam com as maiores tendências da imagem final. Dessa maneira, na decomposição SVD, ao zerar autovalores na matriz $\Sigma$, podemos ignorar autovetores de menor impacto no momento de recomposição e fazer predições dos valores que deveriam estar ali baseado nos autovetores dominantes que sobraram.
+
+Claro, essa técnica também acaba afetando pixels normais. No entanto, sabendo escolher o número certo de autovalores para a situação, é possível minimzar as perdas.
+
+### 4. Aplicando os Conceitos no *Netflix Challenge* e realizando predições
+
+Trazendo a mesma estratégia para o desafio, zerar baixos autovalores significa ignorar os "perfis (como uma combinação de usuários e filmes) menos relevantes", já que a probabilidade que a nota real do nosso usuário seja influenciada por eles é baixa. Assim, deixando apenas os autovetores com maiores autovalores, permitimos que a reconstrução da matriz de avaliações siga apenas os padrões mais "fortes" dos usuários.
+
+Portanto, o que realizamos é uma maneira de mapear usuários para perfis, e então perfis para filmes, manipulando matrizes de dimensão menor, ou seja, com menor sensibildiade em relação a ruído.
+
+Para testar o método, é necessário inserir ruído direramente na base de dados `ratings_small.csv`, que possui uma vasta combinação de usuários, filmes e as suas respectivas notas. Portanto, em uma matriz de notas como:
+
+ALÇSDMALÇSDKÇALSDK
+
+Podemos transformar um de seus valores em uma nota aleatória:
+
+aÇLKSDLÇAKSDÇLAKSDas
+
+Agora, realizando a decomposição, a eliminação dos X menores autovalores e a reconstituição da matriz, obtemos:
+
+XLÇKDAÇSKDLASKDLÇAD
+
+Ao escalar esse processo para matrizes com grandes bases de dados de avaliações, esse efeito de predição (no caso, foi previsto X para a nota real Y) se potencializa e nos permite realizar previsões de notas ainda mais precisas.
 
 ---
 
