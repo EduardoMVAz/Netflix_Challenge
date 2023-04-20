@@ -7,6 +7,7 @@ Developers:
 * Eduardo Mendes Vaz [EduardoMVaz](https://github.com/EduardoMVAz)
 
 ---
+<br/>
 
 ## Como Instalar
 
@@ -39,6 +40,7 @@ Após instalar as dependências, no arquivo `demo.ipynb`, basta rodar célula po
 **Atenção**: alguns testes, como o `Teste (4)`, requerem grande tempo de processamento e alta capacidade computacional. Portanto, é indicado não rodar suas células novamente e apenas executar a criação do gráfico, que utiliza do arquivo `csv` gerado com antecedência em um notebook no *Google Cloud*.
 
 ---
+<br/>
 
 ## Modelo Matemático
 
@@ -72,9 +74,9 @@ SVD é uma técnica de decomposição de matrizes em função de matrizes singul
 
 Ela se baseia no seguinte modelo:
 
-$
-A = U \Sigma V^T,
-$
+$$  
+A = U \Sigma V^T  
+$$ 
 
 onde:
 
@@ -102,19 +104,41 @@ Portanto, o que realizamos é uma maneira de mapear usuários para perfis, e ent
 
 Para testar o método, é necessário inserir ruído direramente na base de dados `ratings_small.csv`, que possui uma vasta combinação de usuários, filmes e as suas respectivas notas. Portanto, em uma matriz de notas como:
 
-ALÇSDMALÇSDKÇALSDK
+$$
+A = \begin{bmatrix}
+3 & 4 & 3 & 4 \  
+5 & 2 & 2 & 3 \  
+2 & 1 & 5 & 3 \  
+5 & 3 & 4 & 1  
+\end{bmatrix}
+$$
 
-Podemos transformar um de seus valores em uma nota aleatória:
+Podemos transformar um de seus valores em uma nota aleatória (onde $R$ é um número randomizado entre 0 e 5):
 
-aÇLKSDLÇAKSDÇLAKSDas
+$$
+A = \begin{bmatrix}
+3 & 4 & R & 4 \  
+5 & 2 & 2 & 3 \  
+2 & 1 & 5 & 3 \  
+5 & 3 & 4 & 1 
+\end{bmatrix}
+$$
 
 Agora, realizando a decomposição, a eliminação dos X menores autovalores e a reconstituição da matriz, obtemos:
 
-XLÇKDAÇSKDLASKDLÇAD
+$$
+A = \begin{bmatrix}
+2.649 & 2.582 & 2.779 & 2.929 \  
+4.928 & 1.711 & 2.565 & 2.782 \  
+2.272, & 2.103 & 2.836 & 3.833 \  
+5.128 & 3.520 & 3.520 & 1.393  
+\end{bmatrix}
+$$
 
-Ao escalar esse processo para matrizes com grandes bases de dados de avaliações, esse efeito de predição (no caso, foi previsto X para a nota real Y) se potencializa e nos permite realizar previsões de notas ainda mais precisas.
+Ao escalar esse processo para matrizes com grandes bases de dados de avaliações, esse efeito de predição (no caso, foi previsto $2.779$ para a nota real $3$) se potencializa e nos permite realizar previsões de notas ainda mais precisas.
 
 ---
+<br/>
 
 ## Testes
 
@@ -202,6 +226,12 @@ Portanto, ao realizar a reconstituição da matriz de *ratings*, a concentraçã
 Após essa hipótese já formulada, percebemos ainda a questão do desvio padrão: por que o erro médio se aproximava e estabilizava ao redor do desvio padrão, a medida que aumentávamos o ruído? Dado que desvio padrão representa a distância média dos dados em relação a média, e as nossas aproximações tendem a média por causa da inserção de ruído, então faz sentido que o erro se aproxime do desvio padrão. **O erro é justamente o quanto o valor previsto está longe do valor real, sendo o valor previsto próximo da média, o erro se aproxima do desvio padrão**.
 
 ---
+<br/>
 
 ## **Seria possível utilizar esse sistema em produção?**
 
+O algoritmo como foi desenvolvido talvez seja simples demais para atuar como um recomendador de filmes nas plataformas de streaming, principalmente partindo da hipótese formulada a partir do teste de estresse em relação a aproximação da média ao desconhecermos muitos valores da matriz. Dessa maneira, seria difícil para o algoritmo selecionar filmes para recomendar, mesmo que ele tivesse uma margem de erro pequena na previsão das avaliações, pois, em uma base de filmes tão massiva quanto a da *Netflix*, determinar o gosto de um usuário para tantos filmes criaria muito ruído na matriz.
+
+Imaginando um cenário real, onde a quantidade de dados é gigantesca, seria também custoso computacionalmente avaliar os dados para tantos filmes, sendo necessárias algumas otimizações e estratégias para diminuir a gama de filmes usada na previsão. Uma medida possível seria utilizar as categorias dos filmes para reduzir o número de autovetores obtidos com a análise de dados, já que intuitivamente alguns dados fornecem pouquíssima informação relevante para prever a avaliação possível de um filme, por exemplo, prever a avaliação de um usuário de um filme como *O Exterminador do Futuro* utilizando dados de filmes de romance ou comédia.
+
+Concluíndo, a resposta é **não**. Apesar de o sistema ser efetivo na base de dados proposta, cumprindo seu papel em testes simples e com poucos dados como os realizados por nós, com um erro absoluto médio baixo, para utilizá-lo em escala seriam necessárias algumas alterações, já que ele é simples demais para atuar como algoritmo de recomendação. Talvez, ele poderia ser incorporado em um sistema maior com mais features, que pudesse usar os dados obtidos de forma mais complexa, tornando-o capaz de escolher entre filmes para recomendar e de ignorar grupos de filmes ao realizar a predição. No entanto, sozinho, ele provavelmente não seria o sistema mais eficiente.
