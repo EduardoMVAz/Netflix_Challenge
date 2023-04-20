@@ -44,6 +44,20 @@ Resumidamente, a ideia é comparar os gostos de um usuário com outros usuários
 
 ### 1. Autovetores e Autovalores
 
+Autovetores e Autovalores são componentes de uma matriz que podem ser descritos da seguinte forma:
+Considerando uma transformação linear, temos que um vetor `x` é um autovetor de uma matriz `A` quando ao multiplicar esse vetor pela própria matriz o resultado é um múltiplo do próprio vetor,
+
+$Ax = x\lambda$
+
+Por multiplicações e inversões matriciais, conseguimos também obter a matriz somente usando seus autovetores e autovalores
+
+$Ax = x\lambda$
+
+* isolamos o x usando matriz inversa
+
+$Axx^{-1} = x\lambda x^{-1}$
+
+$A = x\lambda x^{-1}$
 
 ### 2. SVD
 
