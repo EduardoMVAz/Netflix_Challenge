@@ -97,3 +97,38 @@ Os resultados podem ser visualizados na seguinte imagem:
 
 
 ![100subs10times](100subs10times.png)
+
+Com esse teste, obtivemos o erro médio absoluto de 0.842224701088835, e o desvio padrão dos erros de 1.0998116832025817
+
+#### Terceiro Teste - 10 substituições realizadas 100 vezes
+
+O terceiro teste foi realizar 100 iterações do preditor, com inserção de 10 valores ruído, novamente utilizando 10 autovalores.
+Os resultados podem ser visualizados na seguinte imagem:
+
+
+![10subs100times](10subs100times.png)
+
+Com esse teste, obtivemos o erro médio absoluto de 0.9662062630537643, e o desvio padrão dos erros de 1.235156665491315
+
+#### Quarto Teste - 1 substituição realizada 1000 vezes
+
+Para o último teste, realizamos 1 substituição somente, porém 1000 vezes, ainda utilizando 10 autovalores.
+Os resultados foram os seguintes:
+
+
+![1sub1000times](1sub1000times.png)
+
+Com esse teste, obtivemos o erro médio absoluto de 0.8570620029712793, e o desvio padrão dos erros de 1.1007180289497658
+
+## Teste de Estresse
+
+Inicialmente, nós consideramos que esse teste seria feito visando qual seria a quantidade de ruído que impossibilitaria o preditor de funcionar corretamente. A marca que definimos como desfuncional seria o erro médio absoluto de 2.5. Porém, realizando o teste, descobrimos algo muito interessante: **o erro médio absoluto diminuiu progressivamente a medida que aumentavamos a quantidade de ruído inserida**, e ele estabilizava aproximadamente em 1.1, próximo do valor do **desvio padrão**.
+
+Recaptulando, os valores vazios dos nosso dados são preenchidos com a média das avaliações, aproximadamente 3.5, e os valores a serem previstos são substituídos por um ruído, um valor aleatório entre 0-5, as possíveis notas para os filmes. O valor previsto pelo programa é então comparado com o valor substituído pelo ruído, afim de encontrar o erro. Um fato importante do nosso programa é que **os valores vazios que foram substituídos pela média não são selecionados para substituição por ruído**.
+
+Discutindo, formulamos uma possível hipótese do porquê isso poderia estar acontecendo. Inicialmente não haviamos percebido a relação com o desvio padrão, e chegamos na conclusão de que o que estava acontecendo era o seguinte: quanto menos valores verdadeiros, pelo funcionamento do nosso programa, mais valores média sobravam, e então o programa atuava baseado nesses valores média, e encontrava os valores com mais precisão porque, **na nossa hipótese, os usuários tendem a avaliar os filmes com o valor médio**. Por causa disso, a presença de mais valores médios fazia com que inevitavelmente o preditor acertasse mais, por "apostar" no valor seguro.
+
+Após essa hipótese já formulada, percebemos então a questão do desvio padrão: por que o erro médio se aproximava do desvio padrão, a medida que aumentávamos o ruído? Dado que desvio padrão representa a distância dos dados em relação a média, e as nossas aproximações tendem a média por causa da inserção de ruído, então faz sentido que o erro se aproxime do desvio padrão, **o erro é justamente o quanto o valor previsto está longe do valor real, sendo o valor previsto próximo média, o erro se aproxima do desvio padrão**.
+
+
+
